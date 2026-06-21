@@ -759,14 +759,65 @@ export function resolveRouteIdFromBaseUrl(
 }
 
 export function resolveActiveRouteIdFromEnv(
-  _processEnv: NodeJS.ProcessEnv = process.env,
-  _options?: {
+  processEnv: NodeJS.ProcessEnv = process.env,
+  options?: {
     activeProfileProvider?: string
   },
 ): string | null {
-  // Weo single-provider lock: all traffic routes through the Anthropic-
-  // compatible Weo relay regardless of any inherited CLAUDE_CODE_USE_* /
-  // OPENAI_* / vendor env vars. See src/services/weo/lock.ts.
+  if (isEnvTruthy(processEnv.CLAUDE_CODE_USE_GEMINI)) {
+    return 'gemini'
+  }
+  if (isEnvTruthy(processEnv.CLAUDE_CODE_USE_MISTRAL)) {
+    return 'mistral'
+  }
+  if (isEnvTruthy(processEnv.CLAUDE_CODE_USE_GITHUB)) {
+    return 'github'
+  }
+  if (isEnvTruthy(processEnv.CLAUDE_CODE_USE_BEDROCK)) {
+    return 'bedrock'
+  }
+  if (isEnvTruthy(processEnv.CLAUDE_CODE_USE_VERTEX)) {
+    return 'vertex'
+  }
+
+  const envOnlyRouteId = resolveEnvOnlyProviderRouteId(processEnv)
+  if (envOnlyRouteId) return envOnlyRouteId
+
+  if (isEnvTruthy(processEnv.CLAUDE_CODE_USE_OPENAI)) {
+    const baseUrl =
+      processEnv.OPENAI_BASE_URL ?? processEnv.OPENAI_API_BASE
+    const matchedRoute = resolveRouteIdFromBaseUrl(baseUrl)
+
+    if (
+      processEnv.CLAUDE_CODE_PROVIDER_PROFILE_ENV_APPLIED === '1' &&
+      options?.activeProfileProvider
+    ) {
+      const route = resolveProfileRoute(options.activeProfileProvider)
+      if (
+        route.routeId !== 'unknown-fallback' &&
+        route.routeId !== 'openai' &&
+        route.routeId !== 'custom'
+      ) {
+        return route.routeId
+      }
+    }
+
+    if (matchedRoute) {
+      return matchedRoute
+    }
+
+    const normalizedBaseUrl = normalizeComparableBaseUrl(baseUrl)
+    const openAIDefaultBaseUrl = normalizeComparableBaseUrl(
+      getRouteDefaultBaseUrl('openai'),
+    )
+
+    if (!normalizedBaseUrl || normalizedBaseUrl === openAIDefaultBaseUrl) {
+      return 'openai'
+    }
+
+    return 'custom'
+  }
+
   return 'anthropic'
 }
 

@@ -25,10 +25,13 @@ const COMPETING_ROUTE_ENV = [
   'OPENAI_BASE_URL',
   'OPENAI_API_BASE',
   'OPENAI_API_KEY',
+  // Env-only vendor routes resolved by resolveEnvOnlyProviderRouteId().
   'MINIMAX_API_KEY',
   'FIREWORKS_API_KEY',
   'XAI_API_KEY',
   'NEARAI_API_KEY',
+  'VENICE_API_KEY',
+  'MIMO_API_KEY',
   // First-party Anthropic OAuth / staging toggles
   'USE_STAGING_OAUTH',
 ] as const

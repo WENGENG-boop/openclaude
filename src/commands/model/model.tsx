@@ -75,6 +75,10 @@ import {
 } from '../../utils/providerProfiles.js'
 import { parseModelList } from '../../utils/providerModels.js'
 import { getInitialSettings } from '../../utils/settings/settings.js'
+import {
+  fetchWeoModelIds,
+  weoModelIdsToOptions,
+} from '../../services/weo/models.js'
 
 export type ProviderProfileModelPickerMode = 'auto' | 'profile' | 'provider'
 export type ResolvedProviderProfileModelSurface = 'profile' | 'provider'
@@ -98,6 +102,15 @@ type ModelDiscoveryContext =
       discoveryState?: ModelPickerDiscoveryState
       optionsOverride: ModelOption[]
       profileModelSurface: ResolvedProviderProfileModelSurface
+      routeId: string
+      routeLabel: string
+    }
+  | {
+      kind: 'weo'
+      autoRefresh: boolean
+      canRefresh: boolean
+      discoveryState?: ModelPickerDiscoveryState
+      optionsOverride: ModelOption[]
       routeId: string
       routeLabel: string
     }
@@ -463,6 +476,22 @@ async function loadDescriptorDiscoveryContext(
   }
 }
 
+function loadWeoDiscoveryContext(): ModelDiscoveryContext {
+  const trafficRestricted = isEssentialTrafficOnly()
+  return {
+    kind: 'weo',
+    autoRefresh: !trafficRestricted,
+    canRefresh: !trafficRestricted,
+    discoveryState: trafficRestricted
+      ? undefined
+      : { message: 'Checking Weo models…', tone: 'info' },
+    // Start with just the default option; the live fetch on open fills the rest.
+    optionsOverride: filterModelOptionsByAllowlist([getDefaultOptionForUser()]),
+    routeId: 'weo',
+    routeLabel: 'Weo',
+  }
+}
+
 async function loadModelDiscoveryContext(): Promise<ModelDiscoveryContext | null> {
   const routeId = getActiveRouteId()
   if (routeId && routeId !== 'anthropic') {
@@ -495,7 +524,9 @@ async function loadModelDiscoveryContext(): Promise<ModelDiscoveryContext | null
     }
   }
 
-  return null
+  // Weo single-provider build: when locked to the Anthropic-compatible Weo
+  // relay, discover live from /v1/models instead of showing a static list.
+  return loadWeoDiscoveryContext()
 }
 
 function descriptorDiscoveryStateForResult(options: {
@@ -721,6 +752,32 @@ function ModelPickerWrapper({
           routeLabel: discoveryContext.routeLabel,
         }),
       )
+      return
+    }
+
+    if (discoveryContext.kind === 'weo') {
+      try {
+        const ids = await fetchWeoModelIds()
+        const nextOptions = filterModelOptionsByAllowlist([
+          getDefaultOptionForUser(),
+          ...weoModelIdsToOptions(ids),
+        ])
+        setOptionsOverride(nextOptions)
+        setDiscoveryState({
+          message:
+            ids.length === 0
+              ? 'No models returned by Weo.'
+              : manual
+                ? `Updated Weo models (${ids.length}).`
+                : `Loaded ${ids.length} Weo models.`,
+          tone: ids.length === 0 ? 'warning' : 'success',
+        })
+      } catch (err) {
+        setDiscoveryState({
+          message: `Could not load Weo models: ${err instanceof Error ? err.message : String(err)}`,
+          tone: 'error',
+        })
+      }
       return
     }
 
@@ -1002,6 +1059,17 @@ async function refreshModelsAndSummarize(): Promise<string> {
     return isEssentialTrafficOnly()
       ? 'Model discovery refresh is disabled while nonessential traffic is disabled.'
       : `${discoveryContext.routeLabel} uses a static model catalog; no refresh is needed.`
+  }
+
+  if (discoveryContext.kind === 'weo') {
+    try {
+      const ids = await fetchWeoModelIds()
+      return ids.length === 0
+        ? 'No models returned by Weo.'
+        : `Loaded ${ids.length} Weo models.`
+    } catch (err) {
+      return `Could not load Weo models: ${err instanceof Error ? err.message : String(err)}`
+    }
   }
 
   if (discoveryContext.kind === 'descriptor') {
