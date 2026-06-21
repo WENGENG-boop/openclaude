@@ -1,9 +1,10 @@
 {
-  "name": "@gitlawb/openclaude",
+  "name": "weo",
   "version": "0.19.0",
-  "description": "OpenClaude opens coding-agent workflows to any LLM — OpenAI, Gemini, DeepSeek, Ollama, and 200+ models",
+  "description": "Weo — a native coding-agent terminal powered by the Weo platform",
   "type": "module",
   "bin": {
+    "weo": "./bin/openclaude",
     "openclaude": "./bin/openclaude"
   },
   "exports": {

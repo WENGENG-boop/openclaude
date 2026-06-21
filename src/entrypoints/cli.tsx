@@ -151,9 +151,13 @@ export async function main(
   if (args.length === 1 && (args[0] === '--version' || args[0] === '-v' || args[0] === '-V')) {
     // MACRO.VERSION is inlined at build time
     // biome-ignore lint/suspicious/noConsole:: intentional console output
-    console.log(`${MACRO.DISPLAY_VERSION ?? MACRO.VERSION} (OpenClaude)`);
+    console.log(`${MACRO.DISPLAY_VERSION ?? MACRO.VERSION} (Weo)`);
     return;
   }
+
+  // Weo single-provider lock: normalize the environment once at startup so all
+  // traffic is pinned to the Weo relay regardless of inherited provider vars.
+  (await import('../services/weo/lock.js')).forceWeoProvider();
 
   // Fast-path for `openclaude ps|logs|attach|kill`.
   // Session management is entirely local, so it should not require config,

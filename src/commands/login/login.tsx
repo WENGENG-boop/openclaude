@@ -8,13 +8,10 @@ import {
 } from '../../bridge/trustedDevice.js'
 import type { LocalJSXCommandContext } from '../../commands.js'
 import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
-import {
-  ConsoleOAuthFlow,
-  type ConsoleOAuthFlowResult,
-} from '../../components/ConsoleOAuthFlow.js'
 import { Dialog } from '../../components/design-system/Dialog.js'
 import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
 import { Text } from '../../ink.js'
+import { WeoLoginFlow, type WeoLoginResult } from './WeoLoginFlow.js'
 import { refreshGrowthBookAfterAuthChange } from '../../services/analytics/growthbook.js'
 import { refreshPolicyLimits } from '../../services/policyLimits/index.js'
 import { refreshRemoteManagedSettings } from '../../services/remoteManagedSettings/index.js'
@@ -28,11 +25,7 @@ import {
 } from '../../utils/permissions/bypassPermissionsKillswitch.js'
 import { resetUserCache } from '../../utils/user.js'
 
-type LoginCompletion =
-  | ConsoleOAuthFlowResult
-  | {
-      type: 'cancel'
-    }
+type LoginCompletion = WeoLoginResult
 
 export async function call(
   onDone: LocalJSXCommandOnDone,
@@ -43,11 +36,6 @@ export async function call(
       onDone={async result => {
         if (result.type === 'cancel') {
           onDone('Login interrupted')
-          return
-        }
-
-        if (result.type === 'provider-setup') {
-          onDone(result.message, { display: 'system' })
           return
         }
 
@@ -121,11 +109,8 @@ export function Login(props: {
         )
       }
     >
-      <ConsoleOAuthFlow
-        onDone={result =>
-          props.onDone(result ?? { type: 'cancel' }, mainLoopModel)
-        }
-        startingMessage={props.startingMessage}
+      <WeoLoginFlow
+        onDone={result => props.onDone(result, mainLoopModel)}
       />
     </Dialog>
   )

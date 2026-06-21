@@ -1,0 +1,16 @@
+{
+  "name": "weo-auth-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Device-flow login + account/quota bridge for the Weo terminal, fronting a New API instance",
+  "bin": {
+    "weo-auth-bridge": "./server.mjs"
+  },
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

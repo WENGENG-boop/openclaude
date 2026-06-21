@@ -40,6 +40,18 @@ export interface SecureStorageData {
   mcpXaaIdpConfig?: Record<string, { clientSecret: string }>
   trustedDeviceToken?: string
   pluginSecrets?: Record<string, Record<string, string>>
+  /**
+   * Credentials for the Weo platform (the only provider this build talks to).
+   * `token` is the New-API token used as the Anthropic `x-api-key` against the
+   * relay. Issued by the Weo auth bridge (device flow) or pasted by the user.
+   */
+  weoAuth?: {
+    token: string
+    refreshToken?: string
+    expiresAt?: number
+    userId?: number
+    username?: string
+  }
 }
 
 export interface SecureStorage {

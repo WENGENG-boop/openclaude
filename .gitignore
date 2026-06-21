@@ -7,6 +7,8 @@ web/*.tsbuildinfo
 .env.*
 !.env.example
 auth.json
+.weo-profile.json
+.weo/
 .openclaude-profile.json
 .openclaude/
 reports/

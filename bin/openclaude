@@ -88,7 +88,7 @@ function relaunchWithLongSessionHeapIfNeeded() {
   })
 
   if (result.error) {
-    console.error(`openclaude: failed to restart with long-session heap: ${result.error.message}`)
+    console.error(`weo: failed to restart with long-session heap: ${result.error.message}`)
     process.exit(1)
   }
 
@@ -100,7 +100,7 @@ if (existsSync(distPath)) {
   await import(pathToFileURL(distPath).href)
 } else {
   console.error(`
-  openclaude: dist/cli.mjs not found.
+  weo: dist/cli.mjs not found.
 
   Build first:
     bun run build

@@ -42,8 +42,9 @@ afterEach(() => {
 })
 
 describe('OpenClaude paths', () => {
-  test('defaults user config home to ~/.openclaude', async () => {
+  test('defaults user config home to ~/.weo', async () => {
     await acquireEnvMutex()
+    delete process.env.WEO_CONFIG_DIR
     delete process.env.OPENCLAUDE_CONFIG_DIR
     delete process.env.CLAUDE_CONFIG_DIR
     const { resolveClaudeConfigHomeDir } = await importFreshEnvUtils()
@@ -52,11 +53,12 @@ describe('OpenClaude paths', () => {
       resolveClaudeConfigHomeDir({
         homeDir: homedir(),
       }),
-    ).toBe(join(homedir(), '.openclaude'))
+    ).toBe(join(homedir(), '.weo'))
   })
 
-  test('hard-cuts user config home to ~/.openclaude by default', async () => {
+  test('hard-cuts user config home to ~/.weo by default', async () => {
     await acquireEnvMutex()
+    delete process.env.WEO_CONFIG_DIR
     delete process.env.OPENCLAUDE_CONFIG_DIR
     delete process.env.CLAUDE_CONFIG_DIR
     const { resolveClaudeConfigHomeDir } = await importFreshEnvUtils()
@@ -65,10 +67,10 @@ describe('OpenClaude paths', () => {
       resolveClaudeConfigHomeDir({
         homeDir: homedir(),
       }),
-    ).toBe(join(homedir(), '.openclaude'))
+    ).toBe(join(homedir(), '.weo'))
   })
 
-  test('migrates legacy config home and global config files to .openclaude', async () => {
+  test('migrates legacy config home and global config files to .weo', async () => {
     await acquireEnvMutex()
     const tempHome = mkdtempSync(join(tmpdir(), 'openclaude-paths-test-'))
     try {
@@ -91,34 +93,34 @@ describe('OpenClaude paths', () => {
       expect(migrateLegacyClaudeConfigHome({ homeDir: tempHome })).toBe(true)
       expect(
         readFileSync(
-          join(tempHome, '.openclaude', 'skills', 'legacy-skill', 'SKILL.md'),
+          join(tempHome, '.weo', 'skills', 'legacy-skill', 'SKILL.md'),
           'utf8',
         ),
       ).toBe('legacy skill')
-      expect(existsSync(join(tempHome, '.openclaude', 'settings.json'))).toBe(
+      expect(existsSync(join(tempHome, '.weo', 'settings.json'))).toBe(
         true,
       )
-      expect(readFileSync(join(tempHome, '.openclaude.json'), 'utf8')).toBe(
+      expect(readFileSync(join(tempHome, '.weo.json'), 'utf8')).toBe(
         '{"legacy":true}',
       )
       expect(
-        readFileSync(join(tempHome, '.openclaude-custom-oauth.json'), 'utf8'),
+        readFileSync(join(tempHome, '.weo-custom-oauth.json'), 'utf8'),
       ).toBe('{"custom":true}')
     } finally {
       rmSync(tempHome, { recursive: true, force: true })
     }
   })
 
-  test('migration preserves existing .openclaude data while copying missing legacy data', async () => {
+  test('migration preserves existing .weo data while copying missing legacy data', async () => {
     await acquireEnvMutex()
     const tempHome = mkdtempSync(join(tmpdir(), 'openclaude-paths-test-'))
     try {
       mkdirSync(join(tempHome, '.claude', 'skills', 'legacy-skill'), {
         recursive: true,
       })
-      mkdirSync(join(tempHome, '.openclaude', 'skills'), { recursive: true })
+      mkdirSync(join(tempHome, '.weo', 'skills'), { recursive: true })
       writeFileSync(join(tempHome, '.claude', 'settings.json'), 'legacy')
-      writeFileSync(join(tempHome, '.openclaude', 'settings.json'), 'current')
+      writeFileSync(join(tempHome, '.weo', 'settings.json'), 'current')
       writeFileSync(
         join(tempHome, '.claude', 'skills', 'legacy-skill', 'SKILL.md'),
         'legacy skill',
@@ -128,11 +130,11 @@ describe('OpenClaude paths', () => {
 
       expect(migrateLegacyClaudeConfigHome({ homeDir: tempHome })).toBe(true)
       expect(
-        readFileSync(join(tempHome, '.openclaude', 'settings.json'), 'utf8'),
+        readFileSync(join(tempHome, '.weo', 'settings.json'), 'utf8'),
       ).toBe('current')
       expect(
         readFileSync(
-          join(tempHome, '.openclaude', 'skills', 'legacy-skill', 'SKILL.md'),
+          join(tempHome, '.weo', 'skills', 'legacy-skill', 'SKILL.md'),
           'utf8',
         ),
       ).toBe('legacy skill')
@@ -156,17 +158,17 @@ describe('OpenClaude paths', () => {
           homeDir: tempHome,
         }),
       ).toBe(true)
-      expect(existsSync(join(tempHome, '.openclaude'))).toBe(false)
+      expect(existsSync(join(tempHome, '.weo'))).toBe(false)
     } finally {
       rmSync(tempHome, { recursive: true, force: true })
     }
   })
 
-  test('migration fails closed when .openclaude collides with a non-directory', async () => {
+  test('migration fails closed when .weo collides with a non-directory', async () => {
     await acquireEnvMutex()
     const tempHome = mkdtempSync(join(tmpdir(), 'openclaude-paths-test-'))
     try {
-      writeFileSync(join(tempHome, '.openclaude'), 'not a directory')
+      writeFileSync(join(tempHome, '.weo'), 'not a directory')
       mkdirSync(join(tempHome, '.claude'), { recursive: true })
       writeFileSync(join(tempHome, '.claude', 'settings.json'), 'legacy')
 
@@ -187,17 +189,17 @@ describe('OpenClaude paths', () => {
       const { migrateLegacyClaudeConfigHome } = await importFreshEnvUtils()
 
       expect(migrateLegacyClaudeConfigHome({ homeDir: tempHome })).toBe(true)
-      expect(existsSync(join(tempHome, '.openclaude'))).toBe(false)
+      expect(existsSync(join(tempHome, '.weo'))).toBe(false)
     } finally {
       rmSync(tempHome, { recursive: true, force: true })
     }
   })
 
-  test('config home falls back to legacy when migration fails on a non-directory .openclaude collision', async () => {
+  test('config home falls back to legacy when migration fails on a non-directory .weo collision', async () => {
     await acquireEnvMutex()
     const tempHome = mkdtempSync(join(tmpdir(), 'openclaude-paths-test-'))
     try {
-      writeFileSync(join(tempHome, '.openclaude'), 'not a directory')
+      writeFileSync(join(tempHome, '.weo'), 'not a directory')
       mkdirSync(join(tempHome, '.claude'), { recursive: true })
       mock.module('os', () => ({
         homedir: () => tempHome,
@@ -214,14 +216,15 @@ describe('OpenClaude paths', () => {
     }
   })
 
-  test('default plans directory uses ~/.openclaude/plans', async () => {
+  test('default plans directory uses ~/.weo/plans', async () => {
     await acquireEnvMutex()
+    delete process.env.WEO_CONFIG_DIR
     delete process.env.OPENCLAUDE_CONFIG_DIR
     delete process.env.CLAUDE_CONFIG_DIR
     const { getDefaultPlansDirectory } = await importFreshPlans()
 
     expect(getDefaultPlansDirectory({ homeDir: homedir() })).toBe(
-      join(homedir(), '.openclaude', 'plans'),
+      join(homedir(), '.weo', 'plans'),
     )
   })
 
@@ -262,7 +265,7 @@ describe('OpenClaude paths', () => {
 
     expect(
       getDefaultPlansDirectory({ homeDir: '/tmp/cafe\u0301' }),
-    ).toBe(join('/tmp/caf\u00e9', '.openclaude', 'plans'))
+    ).toBe(join('/tmp/caf\u00e9', '.weo', 'plans'))
   })
 
   test('default plans directory normalizes explicit CLAUDE_CONFIG_DIR to NFC', async () => {

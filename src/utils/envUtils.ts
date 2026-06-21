@@ -12,7 +12,7 @@ import { homedir } from 'os'
 import { dirname, join } from 'path'
 
 const LEGACY_GLOBAL_CONFIG_FILE_RE =
-  /^\.claude(?:-(?:custom|local|staging)-oauth)?\.json$/
+  /^\.(?:openclaude|claude)(?:-(?:custom|local|staging)-oauth)?\.json$/
 
 function getErrnoCode(error: unknown): string | undefined {
   if (
@@ -114,26 +114,33 @@ export function migrateLegacyClaudeConfigHome(options?: {
   }
 
   const homeDir = options?.homeDir ?? homedir()
-  const openClaudeDir = join(homeDir, '.openclaude')
-  const legacyClaudeDir = join(homeDir, '.claude')
+  const weoDir = join(homeDir, '.weo')
 
   try {
-    const legacyDirExists = pathIsDirectory(legacyClaudeDir)
+    // Migrate from the closest predecessor that exists: prefer .openclaude
+    // (the immediate fork), then .claude (the original). Files are only copied
+    // when missing, so chaining is safe and idempotent.
+    const legacySources = ['.openclaude', '.claude'] as const
     const legacyGlobalConfigFiles = getLegacyGlobalConfigFiles(homeDir)
 
-    if (!legacyDirExists && legacyGlobalConfigFiles.length === 0) {
+    let migratedAnyDir = false
+    for (const legacyName of legacySources) {
+      const legacyDir = join(homeDir, legacyName)
+      if (pathIsDirectory(legacyDir)) {
+        copyMissingPathSync(legacyDir, weoDir)
+        migratedAnyDir = true
+      }
+    }
+
+    if (!migratedAnyDir && legacyGlobalConfigFiles.length === 0) {
       return true
     }
 
-    if (legacyDirExists) {
-      copyMissingPathSync(legacyClaudeDir, openClaudeDir)
-    }
-
     for (const legacyFile of legacyGlobalConfigFiles) {
-      const openClaudeFile = legacyFile.replace(/^\.claude/, '.openclaude')
+      const weoFile = legacyFile.replace(/^\.(openclaude|claude)/, '.weo')
       copyMissingPathSync(
         join(homeDir, legacyFile),
-        join(homeDir, openClaudeFile),
+        join(homeDir, weoFile),
       )
     }
     return true
@@ -152,20 +159,32 @@ export function migrateLegacyClaudeConfigHome(options?: {
 let warnedAboutConflictingConfigDirEnvs = false
 
 export function resolveConfigDirEnv(options?: {
+  weoConfigDir?: string
   openClaudeConfigDir?: string
   legacyConfigDir?: string
   warn?: (message: string) => void
 }): string | undefined {
-  const open = options?.openClaudeConfigDir
-  const legacy = options?.legacyConfigDir
-  if (open && legacy && open !== legacy && !warnedAboutConflictingConfigDirEnvs) {
-    const message = `Both OPENCLAUDE_CONFIG_DIR and CLAUDE_CONFIG_DIR are set to different values. Using OPENCLAUDE_CONFIG_DIR=${open}; ignoring CLAUDE_CONFIG_DIR=${legacy}.`
+  // Preference order: WEO_CONFIG_DIR > OPENCLAUDE_CONFIG_DIR > CLAUDE_CONFIG_DIR.
+  const candidates = [
+    { name: 'WEO_CONFIG_DIR', value: options?.weoConfigDir },
+    { name: 'OPENCLAUDE_CONFIG_DIR', value: options?.openClaudeConfigDir },
+    { name: 'CLAUDE_CONFIG_DIR', value: options?.legacyConfigDir },
+  ].filter((c): c is { name: string; value: string } => Boolean(c.value))
+
+  const preferred = candidates[0]
+  const ignored = candidates
+    .slice(1)
+    .filter(c => c.value !== preferred?.value)
+
+  if (preferred && ignored.length > 0 && !warnedAboutConflictingConfigDirEnvs) {
+    const ignoredDesc = ignored.map(c => `${c.name}=${c.value}`).join(', ')
+    const message = `Multiple config-dir env vars are set to different values. Using ${preferred.name}=${preferred.value}; ignoring ${ignoredDesc}.`
     if (options?.warn) {
       warnedAboutConflictingConfigDirEnvs = true
       options.warn(message)
     }
   }
-  return open || legacy || undefined
+  return preferred?.value
 }
 
 /**
@@ -185,9 +204,9 @@ export function resolveClaudeConfigHomeDir(options?: {
   }
 
   const homeDir = options?.homeDir ?? homedir()
-  const openClaudeDir = join(homeDir, '.openclaude')
+  const weoDir = join(homeDir, '.weo')
 
-  return openClaudeDir.normalize('NFC')
+  return weoDir.normalize('NFC')
 }
 
 let claudeConfigHomeDirOverride: string | undefined
@@ -208,11 +227,12 @@ export const getClaudeConfigHomeDir = memoize(
     }
 
     const configDirEnv = resolveConfigDirEnv({
+      weoConfigDir: process.env.WEO_CONFIG_DIR,
       openClaudeConfigDir: process.env.OPENCLAUDE_CONFIG_DIR,
       legacyConfigDir: process.env.CLAUDE_CONFIG_DIR,
       warn: message => {
         // eslint-disable-next-line no-console
-        console.warn(`[openclaude] ${message}`)
+        console.warn(`[weo] ${message}`)
       },
     })
     const homeDir = homedir()
@@ -220,16 +240,17 @@ export const getClaudeConfigHomeDir = memoize(
       configDirEnv,
       homeDir,
     })
-    const openClaudeDir = join(homeDir, '.openclaude')
-    const legacyClaudeDir = join(homeDir, '.claude')
+    const weoDir = join(homeDir, '.weo')
 
-    if (
-      !configDirEnv &&
-      !migrationSucceeded &&
-      !pathIsDirectory(openClaudeDir) &&
-      pathExists(legacyClaudeDir)
-    ) {
-      return legacyClaudeDir.normalize('NFC')
+    // Fall back to a predecessor dir only if migration failed and no .weo dir
+    // exists yet, preferring the closest predecessor (.openclaude, then .claude).
+    if (!configDirEnv && !migrationSucceeded && !pathIsDirectory(weoDir)) {
+      for (const legacyName of ['.openclaude', '.claude'] as const) {
+        const legacyDir = join(homeDir, legacyName)
+        if (pathExists(legacyDir)) {
+          return legacyDir.normalize('NFC')
+        }
+      }
     }
 
     return resolveClaudeConfigHomeDir({
@@ -238,7 +259,7 @@ export const getClaudeConfigHomeDir = memoize(
     })
   },
   () =>
-    `${claudeConfigHomeDirOverride ?? ''}\0${process.env.OPENCLAUDE_CONFIG_DIR ?? ''}\0${process.env.CLAUDE_CONFIG_DIR ?? ''}`,
+    `${claudeConfigHomeDirOverride ?? ''}\0${process.env.WEO_CONFIG_DIR ?? ''}\0${process.env.OPENCLAUDE_CONFIG_DIR ?? ''}\0${process.env.CLAUDE_CONFIG_DIR ?? ''}`,
 )
 
 export function getTeamsDir(): string {

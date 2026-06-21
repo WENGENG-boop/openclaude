@@ -1,0 +1,16 @@
+services:
+  weo-auth-bridge:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    environment:
+      PORT: "8787"
+      # Base URL of your New API instance.
+      NEW_API_BASE_URL: "https://api.weo.asia"
+      # Public URL of THIS bridge (used to build the browser verification link).
+      # When reverse-proxied under the same host, point it at that path, e.g.
+      # https://api.weo.asia/bridge
+      PUBLIC_BASE_URL: "https://api.weo.asia/bridge"
+      DEVICE_CODE_TTL_SEC: "600"
+      POLL_INTERVAL_SEC: "5"
