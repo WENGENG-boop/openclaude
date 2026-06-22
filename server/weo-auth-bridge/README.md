@@ -33,6 +33,16 @@ Quota is read from New API's `/v1/dashboard/billing/subscription` and
 
 ## Run
 
+One-shot on the VPS (starts it, waits for `/healthz`, prints the nginx snippet
+and CLI env vars to set):
+
+```bash
+./deploy.sh            # Docker (default)
+./deploy.sh --node     # plain Node (>=22), backgrounded to bridge.log
+```
+
+Or manually:
+
 ```bash
 cp .env.example .env   # edit NEW_API_BASE_URL + PUBLIC_BASE_URL
 node server.mjs
