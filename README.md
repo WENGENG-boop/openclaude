@@ -76,7 +76,7 @@ OpenClaude requires Node.js `>=22.0.0` for npm installs and runtime. Bun is
 only needed for source builds and local development.
 
 ```bash
-npm install -g @gitlawb/openclaude@latest
+npm install -g weo-code@latest
 ```
 
 If you're on Arch Linux, you can install OpenClaude from the community-maintained [AUR package](https://aur.archlinux.org/packages/openclaude):
@@ -89,9 +89,9 @@ If the install later reports `ripgrep not found`, install ripgrep system-wide an
 **Verify / troubleshoot installed version:**
 
 ```bash
-openclaude --version
-npm view @gitlawb/openclaude dist-tags
-npm install -g @gitlawb/openclaude@latest
+weo --version
+npm view weo-code dist-tags
+npm install -g weo-code@latest
 ```
 
 ### Start

@@ -1,10 +1,11 @@
 {
-  "name": "weo",
+  "name": "weo-code",
   "version": "0.19.0",
   "description": "Weo — a native coding-agent terminal powered by the Weo platform",
   "type": "module",
   "bin": {
     "weo": "./bin/weo",
+    "weo-code": "./bin/weo",
     "openclaude": "./bin/weo"
   },
   "exports": {

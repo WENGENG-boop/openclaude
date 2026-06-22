@@ -134,7 +134,7 @@ result = await Bun.build({
       JSON.stringify('report the issue at https://github.com/Gitlawb/openclaude/issues'),
     'MACRO.FEEDBACK_CHANNEL':
       JSON.stringify('https://github.com/Gitlawb/openclaude/issues'),
-    'MACRO.PACKAGE_URL': JSON.stringify('weo'),
+    'MACRO.PACKAGE_URL': JSON.stringify('weo-code'),
     'MACRO.NATIVE_PACKAGE_URL': 'undefined',
     'MACRO.VERSION_CHANGELOG': 'undefined',
   },
@@ -470,7 +470,7 @@ sdkResult = await Bun.build({
       JSON.stringify('report the issue at https://github.com/Gitlawb/openclaude/issues'),
     'MACRO.FEEDBACK_CHANNEL':
       JSON.stringify('https://github.com/Gitlawb/openclaude/issues'),
-    'MACRO.PACKAGE_URL': JSON.stringify('weo'),
+    'MACRO.PACKAGE_URL': JSON.stringify('weo-code'),
     'MACRO.NATIVE_PACKAGE_URL': 'undefined',
     'MACRO.VERSION_CHANGELOG': 'undefined',
   },
