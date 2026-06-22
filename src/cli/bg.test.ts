@@ -260,7 +260,7 @@ describe('background session CLI parsing', () => {
     const config = buildBackgroundChildProcessConfig({
       execPath: '/usr/bin/node',
       execArgv: ['--max-old-space-size=8192', '--expose-gc'],
-      entrypoint: '/repo/bin/openclaude',
+      entrypoint: '/repo/bin/weo',
       childArgs: ['--print', 'fix failing tests'],
       processEnv: {
         OPENCLAUDE_HEAP_RELAUNCHED: '1',
@@ -274,7 +274,7 @@ describe('background session CLI parsing', () => {
     expect(config.args).toEqual([
       '--max-old-space-size=8192',
       '--expose-gc',
-      '/repo/bin/openclaude',
+      '/repo/bin/weo',
       '--print',
       'fix failing tests',
     ])

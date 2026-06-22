@@ -261,7 +261,7 @@ async function main(): Promise<void> {
     process.exit(buildCode)
   }
 
-  const devCode = await runProcess('node', ['bin/openclaude', ...options.passthroughArgs], env)
+  const devCode = await runProcess('node', ['bin/weo', ...options.passthroughArgs], env)
   process.exit(devCode)
 }
 
