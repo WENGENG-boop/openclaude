@@ -13,6 +13,7 @@ import { getOauthAccountInfo, validateForceLoginOrg } from '../utils/auth.js';
 import { logError } from '../utils/log.js';
 import { getSettings_DEPRECATED } from '../utils/settings/settings.js';
 import { ProviderManager } from './ProviderManager.js';
+import { WeoLoginFlow } from '../commands/login/WeoLoginFlow.js';
 import { Select } from './CustomSelect/select.js';
 import { KeyboardShortcutHint } from './design-system/KeyboardShortcutHint.js';
 import { Spinner } from './Spinner.js';
@@ -62,6 +63,16 @@ type OAuthStatus = {
   toRetry?: OAuthStatus;
 };
 const PASTE_HERE_MSG = 'Paste code here if prompted > ';
+
+/**
+ * Weo build: the Anthropic Console / claude.ai OAuth flow is permanently
+ * disabled. Kept as a runtime helper (rather than deleting the legacy flow) so
+ * dependents keep compiling and the change stays small/reversible.
+ */
+function weoNativeAnthropicLoginDisabled(): boolean {
+  return true;
+}
+
 export function ConsoleOAuthFlow({
   onDone,
   startingMessage,
@@ -69,6 +80,19 @@ export function ConsoleOAuthFlow({
   forceLoginMethod: forceLoginMethodProp,
   initialStatus
 }: Props): React.ReactNode {
+  // Redirect every caller (onboarding, CLI auth handler, teleport recovery) to
+  // the Weo login so users can never reach an Anthropic login. The legacy
+  // Anthropic OAuth implementation below is intentionally retained but unused.
+  if (weoNativeAnthropicLoginDisabled()) {
+    return (
+      <WeoLoginFlow
+        onDone={result =>
+          onDone(result.type === 'success' ? { type: 'oauth' } : undefined)
+        }
+      />
+    );
+  }
+
   const settings = getSettings_DEPRECATED() || {};
   const forceLoginMethod = forceLoginMethodProp ?? settings.forceLoginMethod;
   const orgUUID = settings.forceLoginOrgUUID;
@@ -262,7 +286,7 @@ export function ConsoleOAuthFlow({
           state: 'success'
         });
         void sendNotification({
-          message: 'OpenClaude login successful',
+          message: 'Weo login successful',
           notificationType: 'auth_success'
         }, terminal);
       }
@@ -384,7 +408,7 @@ function OAuthStatusMessage({
     case 'idle': {
       const promptText =
         startingMessage ||
-        'OpenClaude can be used with your Claude subscription or billed based on API usage through your Console account.'
+        'Weo can be used with your Claude subscription or billed based on API usage through your Console account.'
 
       const loginOptions = [
         {
@@ -512,7 +536,7 @@ function OAuthStatusMessage({
         <Box flexDirection="column" gap={1}>
           <Box>
             <Spinner />
-            <Text>Creating API key for OpenClaude…</Text>
+            <Text>Creating API key for Weo…</Text>
           </Box>
         </Box>
       )

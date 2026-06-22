@@ -41,7 +41,7 @@ afterEach(() => {
   }
 })
 
-describe('OpenClaude paths', () => {
+describe('Weo paths', () => {
   test('defaults user config home to ~/.weo', async () => {
     await acquireEnvMutex()
     delete process.env.WEO_CONFIG_DIR

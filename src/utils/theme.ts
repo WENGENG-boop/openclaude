@@ -6,7 +6,7 @@ export type Theme = {
   bashBorder: string
   claude: string
   claudeShimmer: string // Lighter version of claude color for shimmer effect
-  // OpenClaude brand accent (gitlawb orange). Values MUST be rgb() strings in
+  // Weo brand accent (gitlawb orange). Values MUST be rgb() strings in
   // truecolor themes — spinner shimmer/stall interpolation parses them with
   // parseRGB, which silently fails on hex.
   brand: string
@@ -453,9 +453,9 @@ const lightDaltonizedTheme: Theme = {
 const darkTheme: Theme = {
   autoAccept: 'rgb(175,135,255)', // Electric violet
   bashBorder: 'rgb(253,93,177)', // Bright pink
-  claude: 'rgb(255,122,26)', // OpenClaude brand orange
+  claude: 'rgb(255,122,26)', // Weo brand orange
   claudeShimmer: 'rgb(255,177,95)', // Lighter brand orange for shimmer effect
-  brand: 'rgb(255,122,26)', // OpenClaude brand orange
+  brand: 'rgb(255,122,26)', // Weo brand orange
   brandShimmer: 'rgb(255,177,95)', // Lighter brand orange for shimmer effect
   claudeBlue_FOR_SYSTEM_SPINNER: 'rgb(147,165,255)', // Blue for system spinner
   claudeBlueShimmer_FOR_SYSTEM_SPINNER: 'rgb(177,195,255)', // Lighter blue for system spinner shimmer

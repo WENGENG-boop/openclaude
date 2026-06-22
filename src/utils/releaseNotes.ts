@@ -28,7 +28,7 @@ type GitHubRelease = {
 }
 
 /**
- * We fetch OpenClaude release notes from GitHub instead of bundling them with
+ * We fetch Weo release notes from GitHub instead of bundling them with
  * the build.
  *
  * This is necessary because Ink's static rendering makes it difficult to
@@ -378,7 +378,7 @@ export function getRecentReleaseNotes(
     const baseCurrentVersion = coerce(currentVersion)
     let basePreviousVersion = previousVersion ? coerce(previousVersion) : null
 
-    // Older OpenClaude builds stored the internal compatibility version
+    // Older Weo builds stored the internal compatibility version
     // (e.g. 99.0.0) as the "seen" marker. Treat that as unseen so users
     // can start receiving release notes keyed to the public version.
     if (

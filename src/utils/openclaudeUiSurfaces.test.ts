@@ -42,7 +42,7 @@ afterEach(() => {
   }
 })
 
-describe('OpenClaude settings path surfaces', () => {
+describe('Weo settings path surfaces', () => {
   test('isClaudeSettingsPath recognizes project .openclaude settings files', () => {
     expect(
       isClaudeSettingsPath(
@@ -164,7 +164,7 @@ describe('OpenClaude settings path surfaces', () => {
   })
 })
 
-describe('OpenClaude validation tips', () => {
+describe('Weo validation tips', () => {
   test('permissions.defaultMode invalid value keeps suggestion but no Claude docs link', () => {
     const tip = getValidationTip({
       path: 'permissions.defaultMode',
@@ -186,7 +186,7 @@ describe('OpenClaude validation tips', () => {
   })
 })
 
-describe('OpenClaude permission mode surfaces', () => {
+describe('Weo permission mode surfaces', () => {
   test('default permission mode picker excludes dangerous persisted modes', () => {
     const options = getDefaultPermissionModeOptions(true)
 

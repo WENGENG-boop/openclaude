@@ -1702,7 +1702,7 @@ export function checkEditableInternalPath(
       updatedInput: input,
       decisionReason: {
         type: 'other',
-        reason: 'OpenClaude commit message file is allowed for writing',
+        reason: 'Weo commit message file is allowed for writing',
       },
     }
   }

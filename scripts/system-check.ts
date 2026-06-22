@@ -130,7 +130,7 @@ export function readNodeExecutableVersion(
   if (result.error) {
     return {
       ok: false,
-      detail: `Unable to run \`node --version\`: ${result.error.message}. OpenClaude requires Node.js ${MIN_NODE_ENGINE_RANGE} on PATH.`,
+      detail: `Unable to run \`node --version\`: ${result.error.message}. Weo requires Node.js ${MIN_NODE_ENGINE_RANGE} on PATH.`,
     }
   }
 
@@ -139,7 +139,7 @@ export function readNodeExecutableVersion(
     const suffix = output ? `: ${output}` : `: exit code ${result.status ?? 'unknown'}`
     return {
       ok: false,
-      detail: `Unable to run \`node --version\`${suffix}. OpenClaude requires Node.js ${MIN_NODE_ENGINE_RANGE} on PATH.`,
+      detail: `Unable to run \`node --version\`${suffix}. Weo requires Node.js ${MIN_NODE_ENGINE_RANGE} on PATH.`,
     }
   }
 
@@ -147,7 +147,7 @@ export function readNodeExecutableVersion(
   if (!version) {
     return {
       ok: false,
-      detail: `Unable to read Node.js version from \`node --version\`. OpenClaude requires Node.js ${MIN_NODE_ENGINE_RANGE} on PATH.`,
+      detail: `Unable to read Node.js version from \`node --version\`. Weo requires Node.js ${MIN_NODE_ENGINE_RANGE} on PATH.`,
     }
   }
 

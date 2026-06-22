@@ -117,14 +117,17 @@ async function waitForOutput(
   throw new Error('Timed out waiting for ConsoleOAuthFlow test output')
 }
 
-test('login picker shows the third-party platform option', async () => {
+// Disabled in the Weo build: ConsoleOAuthFlow now redirects to the Weo login,
+// so the legacy Anthropic login picker / third-party provider-manager branch is
+// unreachable. Kept (skipped, not deleted) per the disable-don't-delete policy.
+test.skip('login picker shows the third-party platform option', async () => {
   const output = await renderFrame(<ConsoleOAuthFlow onDone={() => {}} />)
 
   expect(output).toContain('Select login method:')
   expect(output).toContain('3rd-party platform')
 })
 
-test('third-party provider branch opens the first-run provider manager', async () => {
+test.skip('third-party provider branch opens the first-run provider manager', async () => {
   const output = await renderFrame(
     <ConsoleOAuthFlow
       initialStatus={{ state: 'platform_setup' }}

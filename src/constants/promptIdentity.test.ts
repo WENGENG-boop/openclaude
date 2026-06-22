@@ -161,35 +161,35 @@ test('system prompt includes immediate-tool-use directive in REPL mode', async (
   }
 })
 
-test('built-in agent prompts describe OpenClaude instead of Claude Code', () => {
-  expect(DEFAULT_AGENT_PROMPT).toContain('OpenClaude')
+test('built-in agent prompts describe Weo instead of Claude Code', () => {
+  expect(DEFAULT_AGENT_PROMPT).toContain('Weo')
   expect(DEFAULT_AGENT_PROMPT).not.toContain('Claude Code')
   expect(DEFAULT_AGENT_PROMPT).not.toContain("Anthropic's official CLI for Claude")
 
   const generalPrompt = GENERAL_PURPOSE_AGENT.getSystemPrompt({
     toolUseContext: { options: {} as never },
   })
-  expect(generalPrompt).toContain('OpenClaude')
+  expect(generalPrompt).toContain('Weo')
   expect(generalPrompt).not.toContain('Claude Code')
   expect(generalPrompt).not.toContain("Anthropic's official CLI for Claude")
 
   const explorePrompt = EXPLORE_AGENT.getSystemPrompt({
     toolUseContext: { options: {} as never },
   })
-  expect(explorePrompt).toContain('OpenClaude')
+  expect(explorePrompt).toContain('Weo')
   expect(explorePrompt).not.toContain('Claude Code')
   expect(explorePrompt).not.toContain("Anthropic's official CLI for Claude")
 
   const planPrompt = PLAN_AGENT.getSystemPrompt({
     toolUseContext: { options: {} as never },
   })
-  expect(planPrompt).toContain('OpenClaude')
+  expect(planPrompt).toContain('Weo')
   expect(planPrompt).not.toContain('Claude Code')
 
   const statuslinePrompt = STATUSLINE_SETUP_AGENT.getSystemPrompt({
     toolUseContext: { options: {} as never },
   })
-  expect(statuslinePrompt).toContain('OpenClaude')
+  expect(statuslinePrompt).toContain('Weo')
   expect(statuslinePrompt).not.toContain('Claude Code')
 
   const guidePrompt = CLAUDE_CODE_GUIDE_AGENT.getSystemPrompt({
@@ -201,9 +201,9 @@ test('built-in agent prompts describe OpenClaude instead of Claude Code', () => 
       } as never,
     },
   })
-  expect(guidePrompt).toContain('OpenClaude')
-  expect(guidePrompt).toContain('You are the OpenClaude guide agent.')
-  expect(guidePrompt).toContain('**OpenClaude** (the CLI tool)')
+  expect(guidePrompt).toContain('Weo')
+  expect(guidePrompt).toContain('You are the Weo guide agent.')
+  expect(guidePrompt).toContain('**Weo** (the CLI tool)')
   expect(guidePrompt).not.toContain('You are the Claude guide agent.')
   expect(guidePrompt).not.toContain('**Claude Code** (the CLI tool)')
 })

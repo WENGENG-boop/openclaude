@@ -31,7 +31,7 @@ function permissionContext(mode: ToolPermissionContext['mode']) {
   } satisfies ToolPermissionContext
 }
 
-describe('OpenClaude commit message temp file permissions', () => {
+describe('Weo commit message temp file permissions', () => {
   let originalCwd: string
   let projectDir: string
 
@@ -57,7 +57,7 @@ describe('OpenClaude commit message temp file permissions', () => {
     expect(result.behavior).toBe('allow')
     expect(result.decisionReason).toMatchObject({
       type: 'other',
-      reason: 'OpenClaude commit message file is allowed for writing',
+      reason: 'Weo commit message file is allowed for writing',
     })
   })
 
@@ -71,7 +71,7 @@ describe('OpenClaude commit message temp file permissions', () => {
     expect(result.behavior).toBe('allow')
     expect(result.decisionReason).toMatchObject({
       type: 'other',
-      reason: 'OpenClaude commit message file is allowed for writing',
+      reason: 'Weo commit message file is allowed for writing',
     })
   })
 

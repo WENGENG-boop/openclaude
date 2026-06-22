@@ -639,7 +639,7 @@ export async function handleBgFlag(args: string[]): Promise<void> {
   await ensureBackgroundSessionDirs()
   const entrypoint = process.argv[1]
   if (!entrypoint) {
-    fail('Cannot determine OpenClaude entrypoint for background session')
+    fail('Cannot determine Weo entrypoint for background session')
   }
   const childConfig = buildBackgroundChildProcessConfig({
     execPath: process.execPath,

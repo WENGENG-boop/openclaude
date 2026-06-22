@@ -379,8 +379,8 @@ export async function detectStaleProjectSettingsPaths(
   const canonicalPaths = stale.map(pair => pair.canonical).join(', ')
 
   return {
-    issue: `Legacy project settings file${stale.length === 1 ? '' : 's'} ${legacyPaths} found, but OpenClaude reads ${canonicalPaths}`,
-    fix: `Move or copy ${legacyPaths} to ${canonicalPaths} if you intended OpenClaude to use those project settings.`,
+    issue: `Legacy project settings file${stale.length === 1 ? '' : 's'} ${legacyPaths} found, but Weo reads ${canonicalPaths}`,
+    fix: `Move or copy ${legacyPaths} to ${canonicalPaths} if you intended Weo to use those project settings.`,
   }
 }
 

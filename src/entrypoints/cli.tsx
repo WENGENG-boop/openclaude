@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle';
 
 // Defensive compatibility guard for environments where globalThis.File is
-// unexpectedly absent. OpenClaude's supported runtime is Node >=22; this is
+// unexpectedly absent. Weo's supported runtime is Node >=22; this is
 // not a Node 18 support guarantee. The guard is harmless on supported Node
 // versions and prevents undici's module evaluation from throwing in unusual
 // embedded/runtime setups.
@@ -27,7 +27,7 @@ if (typeof globalThis.File === 'undefined') {
   }
 }
 
-// OpenClaude: disable experimental API betas by default.
+// Weo: disable experimental API betas by default.
 // Tool search (defer_loading), global cache scope, and context management
 // require internal API support not available to external accounts → 500.
 // Users can opt-in with CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=false.

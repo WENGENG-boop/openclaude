@@ -51,9 +51,9 @@ describe('detectStaleProjectSettingsPaths', () => {
 
     expect(warning).toEqual({
       issue:
-        'Legacy project settings file .claude/settings.json found, but OpenClaude reads .openclaude/settings.json',
+        'Legacy project settings file .claude/settings.json found, but Weo reads .openclaude/settings.json',
       fix:
-        'Move or copy .claude/settings.json to .openclaude/settings.json if you intended OpenClaude to use those project settings.',
+        'Move or copy .claude/settings.json to .openclaude/settings.json if you intended Weo to use those project settings.',
     })
   })
 

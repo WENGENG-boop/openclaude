@@ -207,7 +207,7 @@ import stats from './commands/stats/index.js'
 const usageReport: Command = {
   type: 'prompt',
   name: 'insights',
-  description: 'Generate a report analyzing your OpenClaude sessions',
+  description: 'Generate a report analyzing your Weo sessions',
   contentLength: 0,
   progressMessage: 'analyzing your sessions',
   source: 'builtin',
@@ -238,6 +238,24 @@ export type {
   ResumeEntrypoint,
 } from './types/command.js'
 export { getCommandName, isCommandEnabled } from './types/command.js'
+
+/**
+ * Commands disabled in the Weo build.
+ *
+ * Weo is a single-platform terminal: it talks only to the Weo relay and has no
+ * Anthropic desktop/mobile/browser companion apps, no Claude GitHub/Slack apps,
+ * and no third-party provider onboarding. These commands are filtered out of the
+ * command list entirely, so they are neither listed nor invocable.
+ */
+export const WEO_DISABLED_COMMAND_NAMES: ReadonlySet<string> = new Set([
+  'desktop', // "Continue the current session in Claude Desktop"
+  'mobile', // "Show QR code to download the Claude mobile app"
+  'chrome', // "Claude in Chrome (Beta) settings"
+  'ide', // Anthropic IDE-extension integration
+  'install-github-app', // "Set up Claude GitHub Actions for a repository"
+  'install-slack-app', // "Install the Claude Slack app"
+  'onboard-github', // GitHub Models provider onboarding (non-Weo provider)
+])
 
 // Commands that get eliminated from the external build
 export const INTERNAL_ONLY_COMMANDS = [
@@ -378,7 +396,10 @@ const COMMANDS = memoize((): Command[] => [
   ...(process.env.USER_TYPE === 'ant' && !process.env.IS_DEMO
     ? INTERNAL_ONLY_COMMANDS
     : []),
-].filter(isCommand).map(withOpenClaudeCommandLocalizationKey))
+]
+  .filter(isCommand)
+  .filter(cmd => !WEO_DISABLED_COMMAND_NAMES.has(cmd.name))
+  .map(withOpenClaudeCommandLocalizationKey))
 
 function withOpenClaudeCommandLocalizationKey(cmd: Command): Command {
   cmd.localizationKey ??= getOpenClaudeCommandDescriptionKey(cmd.name)

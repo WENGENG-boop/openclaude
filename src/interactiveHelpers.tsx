@@ -25,8 +25,10 @@ import { isEnvTruthy, isRunningOnHomespace } from './utils/envUtils.js';
 import { type FpsMetrics, FpsTracker } from './utils/fpsTracker.js';
 import { updateGithubRepoPathMapping } from './utils/githubRepoPathMapping.js';
 import { applyConfigEnvironmentVariables } from './utils/managedEnv.js';
-import { usesAnthropicAccountFlow } from './utils/model/providers.js';
 import { showDangerousModePromptIfNeeded } from './utils/permissions/dangerousModePromptFlow.js';
+import { hasWeoCredential } from './services/weo/auth.js';
+import { forceWeoProvider } from './services/weo/lock.js';
+import { WeoLoginFlow } from './commands/login/WeoLoginFlow.js';
 import type { PermissionMode } from './utils/permissions/PermissionMode.js';
 import { getBaseRenderOptions } from './utils/renderOptions.js';
 import { getSettingsWithAllErrors } from './utils/settings/allErrors.js';
@@ -109,7 +111,28 @@ export async function showSetupScreens(root: Root, permissionMode: PermissionMod
     return false;
   }
 
-  const usesAnthropicSetup = usesAnthropicAccountFlow();
+  // Weo single-platform build: require a Weo login before anything else. Without
+  // a credential the terminal cannot talk to the relay, so a fresh user is sent
+  // straight into the Weo login flow (browser device flow + paste-token
+  // fallback). Refusing to log in exits — there is no anonymous mode.
+  if (!hasWeoCredential()) {
+    const result = await showSetupDialog<{ type: 'success' | 'cancel' }>(
+      root,
+      done => <WeoLoginFlow onDone={done} />,
+      { onChangeAppState },
+    );
+    if (result?.type !== 'success') {
+      gracefulShutdownSync(1);
+      return false;
+    }
+    // Pin the freshly issued token into the environment for this session.
+    forceWeoProvider();
+  }
+
+  // Weo is a single-platform terminal: the provider is always the Weo relay, so
+  // Anthropic account onboarding / trust-via-account / approve-Anthropic-key
+  // flows never apply (Weo behaves like a third-party provider here).
+  const usesAnthropicSetup = false;
   const config = getGlobalConfig();
   let onboardingShown = false;
 
