@@ -77,24 +77,24 @@ afterEach(() => {
   clearSystemPromptSections()
 })
 
-test('CLI identity prefixes describe OpenClaude instead of Claude Code', () => {
-  expect(getCLISyspromptPrefix()).toContain('OpenClaude')
+test('CLI identity prefixes describe Weo instead of Claude Code', () => {
+  expect(getCLISyspromptPrefix()).toContain('Weo')
   expect(getCLISyspromptPrefix()).not.toContain('Claude Code')
   expect(getCLISyspromptPrefix()).not.toContain("Anthropic's official CLI for Claude")
 
   for (const prefix of CLI_SYSPROMPT_PREFIXES) {
-    expect(prefix).toContain('OpenClaude')
+    expect(prefix).toContain('Weo')
     expect(prefix).not.toContain('Claude Code')
     expect(prefix).not.toContain("Anthropic's official CLI for Claude")
   }
 })
 
-test('simple mode identity describes OpenClaude instead of Claude Code', async () => {
+test('simple mode identity describes Weo instead of Claude Code', async () => {
   process.env.CLAUDE_CODE_SIMPLE = '1'
 
   const prompt = await getSystemPrompt([], 'gpt-4o')
 
-  expect(prompt[0]).toContain('OpenClaude')
+  expect(prompt[0]).toContain('Weo')
   expect(prompt[0]).not.toContain('Claude Code')
   expect(prompt[0]).not.toContain("Anthropic's official CLI for Claude")
 })

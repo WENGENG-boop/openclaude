@@ -173,7 +173,7 @@ test('buildAPIProviderProperties redacts token-bearing direct provider base URLs
     {
       provider: 'firstParty' as const,
       env: 'ANTHROPIC_BASE_URL',
-      label: 'Anthropic base URL',
+      label: 'Weo base URL',
     },
     {
       provider: 'bedrock' as const,

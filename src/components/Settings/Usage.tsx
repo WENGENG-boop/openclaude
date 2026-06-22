@@ -24,6 +24,7 @@ import { isEligibleForOverageCreditGrant, OverageCreditUpsell } from '../LogoV2/
 import { CodexUsage } from './CodexUsage.js';
 import { MiniMaxUsage } from './MiniMaxUsage.js';
 import { UnsupportedUsage } from './UnsupportedUsage.js';
+import { WeoUsage } from './WeoUsage.js';
 type LimitBarProps = {
   title: string;
   limit: RateLimit;
@@ -273,22 +274,9 @@ function AnthropicUsage(): React.ReactNode {
     </Box>;
 }
 export function Usage(): React.ReactNode {
-  const provider = getAPIProvider();
-  const activeProfile = getActiveProviderProfile();
-  const usageDescriptor = getUsageDescriptor(resolveActiveUsageId(process.env, {
-    activeProfileProvider: activeProfile?.provider,
-    providerCategory: provider,
-  }));
-  if (provider === 'codex') {
-    return <CodexUsage />;
-  }
-  if (usageDescriptor.resolvedId === 'minimax' && usageDescriptor.supported) {
-    return <MiniMaxUsage />;
-  }
-  if (usageDescriptor.resolvedId === 'anthropic' && usageDescriptor.supported) {
-    return <AnthropicUsage />;
-  }
-  return <UnsupportedUsage providerLabel={usageDescriptor.activeLabel} />;
+  // Weo single-provider build: usage always reflects the Weo platform
+  // (account quota + this session's per-model usage).
+  return <WeoUsage />;
 }
 type ExtraUsageSectionProps = {
   extraUsage: ExtraUsage;

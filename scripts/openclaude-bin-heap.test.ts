@@ -2,9 +2,9 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, test } from 'bun:test'
 
-const BIN_PATH = join(import.meta.dir, '..', 'bin', 'openclaude')
+const BIN_PATH = join(import.meta.dir, '..', 'bin', 'weo')
 
-describe('openclaude launcher heap guard', () => {
+describe('weo launcher heap guard', () => {
   test('raises the current Node heap before loading dist/cli.mjs', () => {
     const source = readFileSync(BIN_PATH, 'utf-8')
 

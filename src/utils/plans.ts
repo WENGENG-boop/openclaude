@@ -27,6 +27,7 @@ const MAX_SLUG_RETRIES = 10
 
 export function getDefaultPlansDirectory({
   configDirEnv = resolveConfigDirEnv({
+    weoConfigDir: process.env.WEO_CONFIG_DIR,
     openClaudeConfigDir: process.env.OPENCLAUDE_CONFIG_DIR,
     legacyConfigDir: process.env.CLAUDE_CONFIG_DIR,
   }),
@@ -38,7 +39,7 @@ export function getDefaultPlansDirectory({
   if (configDirEnv) {
     return join(configDirEnv.normalize('NFC'), 'plans')
   }
-  return join(homeDir, '.openclaude', 'plans').normalize('NFC')
+  return join(homeDir, '.weo', 'plans').normalize('NFC')
 }
 
 /**

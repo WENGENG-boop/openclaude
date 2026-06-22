@@ -59,9 +59,9 @@ async function importFreshEnvModule() {
 
 // getGlobalClaudeFile — default path plus explicit override compatibility
 
-test('getGlobalClaudeFile: new install returns .openclaude.json when neither file exists', async () => {
+test('getGlobalClaudeFile: new install returns .weo.json when neither file exists', async () => {
   const { getGlobalClaudeFile } = await importFreshEnvModule()
-  expect(getGlobalClaudeFile()).toBe(join(tempDir, '.openclaude.json'))
+  expect(getGlobalClaudeFile()).toBe(join(tempDir, '.weo.json'))
 })
 
 test('getGlobalClaudeFile: explicit config dir keeps .claude.json fallback when only legacy file exists', async () => {
@@ -70,7 +70,15 @@ test('getGlobalClaudeFile: explicit config dir keeps .claude.json fallback when 
   expect(getGlobalClaudeFile()).toBe(join(tempDir, '.claude.json'))
 })
 
-test('getGlobalClaudeFile: migrated user uses .openclaude.json when both files exist', async () => {
+test('getGlobalClaudeFile: migrated user uses .weo.json when it exists', async () => {
+  writeFileSync(join(tempDir, '.claude.json'), '{}')
+  writeFileSync(join(tempDir, '.openclaude.json'), '{}')
+  writeFileSync(join(tempDir, '.weo.json'), '{}')
+  const { getGlobalClaudeFile } = await importFreshEnvModule()
+  expect(getGlobalClaudeFile()).toBe(join(tempDir, '.weo.json'))
+})
+
+test('getGlobalClaudeFile: prefers .openclaude.json over .claude.json when .weo.json is missing', async () => {
   writeFileSync(join(tempDir, '.claude.json'), '{}')
   writeFileSync(join(tempDir, '.openclaude.json'), '{}')
   const { getGlobalClaudeFile } = await importFreshEnvModule()
@@ -85,7 +93,7 @@ test('getGlobalClaudeFile: OPENCLAUDE_CONFIG_DIR uses preferred config dir', asy
 
     const { getGlobalClaudeFile } = await importFreshEnvModule()
 
-    expect(getGlobalClaudeFile()).toBe(join(preferredDir, '.openclaude.json'))
+    expect(getGlobalClaudeFile()).toBe(join(preferredDir, '.weo.json'))
   } finally {
     rmSync(preferredDir, { recursive: true, force: true })
   }

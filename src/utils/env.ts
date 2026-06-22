@@ -26,15 +26,20 @@ export function resolveGlobalClaudeFile(options: {
   const oauthSuffix = options.oauthSuffix ?? ''
   const configDir = options.configDirEnv || options.homeDir || homedir()
   const hasExplicitConfigDir = Boolean(options.configDirEnv)
-  const newFilename = `.openclaude${oauthSuffix}.json`
-  const legacyFilename = `.claude${oauthSuffix}.json`
+  const newFilename = `.weo${oauthSuffix}.json`
+  const legacyFilenames = [
+    `.openclaude${oauthSuffix}.json`,
+    `.claude${oauthSuffix}.json`,
+  ]
 
-  if (
-    (hasExplicitConfigDir || options.migrationSucceeded === false) &&
-    !options.existsSync(join(configDir, newFilename)) &&
-    options.existsSync(join(configDir, legacyFilename))
-  ) {
-    return join(configDir, legacyFilename)
+  if (hasExplicitConfigDir || options.migrationSucceeded === false) {
+    if (!options.existsSync(join(configDir, newFilename))) {
+      for (const legacy of legacyFilenames) {
+        if (options.existsSync(join(configDir, legacy))) {
+          return join(configDir, legacy)
+        }
+      }
+    }
   }
   return join(configDir, newFilename)
 }
@@ -52,6 +57,7 @@ export const getGlobalClaudeFile = memoize((): string => {
 
   const oauthSuffix = fileSuffixForOauthConfig()
   const configDirEnv = resolveConfigDirEnv({
+    weoConfigDir: process.env.WEO_CONFIG_DIR,
     openClaudeConfigDir: process.env.OPENCLAUDE_CONFIG_DIR,
     legacyConfigDir: process.env.CLAUDE_CONFIG_DIR,
   })

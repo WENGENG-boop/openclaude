@@ -1,5 +1,5 @@
-export const PRODUCT_DISPLAY_NAME = 'OpenClaude'
-export const PRODUCT_URL = 'https://claude.com/claude-code'
+export const PRODUCT_DISPLAY_NAME = 'Weo'
+export const PRODUCT_URL = 'https://weo.asia'
 
 // Claude Code Remote session URLs
 export const CLAUDE_AI_BASE_URL = 'https://claude.ai'

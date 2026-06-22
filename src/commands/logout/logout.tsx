@@ -67,7 +67,9 @@ export async function call(): Promise<React.ReactNode> {
   await performLogout({
     clearOnboarding: true
   });
-  const message = <Text>Successfully logged out from your Anthropic account.</Text>;
+  const { clearWeoAccountCache } = await import('../../services/weo/account.js');
+  clearWeoAccountCache();
+  const message = <Text>Successfully signed out of Weo.</Text>;
   setTimeout(() => {
     gracefulShutdownSync(0, 'logout');
   }, 200);

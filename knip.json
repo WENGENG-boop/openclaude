@@ -7,7 +7,7 @@
     "src/entrypoints/sdk/index.ts",
     "src/main.tsx",
     "scripts/**/*.ts",
-    "bin/openclaude",
+    "bin/weo",
     "src/**/*.test.{ts,tsx}",
     "src/**/__tests__/**/*.{ts,tsx}",
     "tests/**/*.test.ts"

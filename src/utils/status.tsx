@@ -346,6 +346,10 @@ export function buildAccountProperties(): Property[] {
 export function buildAPIProviderProperties(): Property[] {
   const apiProvider = getAPIProvider();
   const properties: Property[] = [];
+  properties.push({
+    label: 'Signed in as',
+    value: 'WEO official',
+  });
   const secretSource: SecretValueSource = {};
   for (const key of getKnownProviderSecretEnvKeys()) {
     const envValue = process.env[key];
@@ -363,7 +367,7 @@ export function buildAPIProviderProperties(): Property[] {
   if (apiProvider === 'firstParty') {
     pushRedactedUrlProperty(
       properties,
-      'Anthropic base URL',
+      'Weo base URL',
       process.env.ANTHROPIC_BASE_URL,
       secretSource,
     );
