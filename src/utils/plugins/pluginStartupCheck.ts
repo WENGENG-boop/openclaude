@@ -9,6 +9,7 @@ import {
   updateSettingsForSource,
 } from '../settings/settings.js'
 import { getAddDirEnabledPlugins } from './addDirPluginSettings.js'
+import { getBuiltinDefaultEnabledPlugins } from './agentSkillsMarketplace.js'
 import {
   getInMemoryInstalledPlugins,
   migrateFromEnabledPlugins,
@@ -40,7 +41,17 @@ export async function checkEnabledPlugins(): Promise<string[]> {
   const settings = getInitialSettings()
   const enabledPlugins: string[] = []
 
-  // Start with --add-dir plugins (lowest priority)
+  // Built-in default-on plugins (e.g. document-skills) sit at the lowest
+  // priority; --add-dir and merged settings can still override (incl. disable).
+  for (const [pluginId, value] of Object.entries(
+    getBuiltinDefaultEnabledPlugins(),
+  )) {
+    if (pluginId.includes('@') && value) {
+      enabledPlugins.push(pluginId)
+    }
+  }
+
+  // --add-dir plugins (override built-in defaults)
   const addDirPlugins = getAddDirEnabledPlugins()
   for (const [pluginId, value] of Object.entries(addDirPlugins)) {
     if (pluginId.includes('@') && value) {

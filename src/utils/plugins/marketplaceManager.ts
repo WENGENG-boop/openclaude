@@ -65,6 +65,11 @@ import {
   isSourceInBlocklist,
 } from './marketplaceHelpers.js'
 import {
+  AGENT_SKILLS_MARKETPLACE_NAME,
+  AGENT_SKILLS_MARKETPLACE_SOURCE,
+  getBuiltinDefaultEnabledPlugins,
+} from './agentSkillsMarketplace.js'
+import {
   OFFICIAL_MARKETPLACE_NAME,
   OFFICIAL_MARKETPLACE_SOURCE,
 } from './officialMarketplace.js'
@@ -226,23 +231,32 @@ export type DeclaredMarketplace = {
 export function getDeclaredMarketplaces(): Record<string, DeclaredMarketplace> {
   const implicit: Record<string, DeclaredMarketplace> = {}
 
-  // Only the official marketplace can be implicitly declared — it's the one
-  // built-in source we know. Other marketplaces have no default source to inject.
-  // Explicitly-disabled entries (value: false) don't count.
+  // Built-in marketplaces with a known default source can be implicitly
+  // declared (cloned on demand) when an enabled plugin references them. Other
+  // marketplaces have no default source to inject.
+  const BUILTIN_IMPLICIT_MARKETPLACES: Record<string, MarketplaceSource> = {
+    [OFFICIAL_MARKETPLACE_NAME]: OFFICIAL_MARKETPLACE_SOURCE,
+    [AGENT_SKILLS_MARKETPLACE_NAME]: AGENT_SKILLS_MARKETPLACE_SOURCE,
+  }
+
+  // getBuiltinDefaultEnabledPlugins() seeds default-on built-in plugins (e.g.
+  // document-skills) at the LOWEST precedence; an explicit `false` in --add-dir
+  // or merged settings still wins. Explicitly-disabled entries don't count.
   const enabledPlugins = {
+    ...getBuiltinDefaultEnabledPlugins(),
     ...getAddDirEnabledPlugins(),
     ...(getInitialSettings().enabledPlugins ?? {}),
   }
   for (const [pluginId, value] of Object.entries(enabledPlugins)) {
-    if (
-      value &&
-      parsePluginIdentifier(pluginId).marketplace === OFFICIAL_MARKETPLACE_NAME
-    ) {
-      implicit[OFFICIAL_MARKETPLACE_NAME] = {
-        source: OFFICIAL_MARKETPLACE_SOURCE,
+    if (!value) continue
+    const { marketplace } = parsePluginIdentifier(pluginId)
+    if (!marketplace) continue
+    const source = BUILTIN_IMPLICIT_MARKETPLACES[marketplace]
+    if (source && !implicit[marketplace]) {
+      implicit[marketplace] = {
+        source,
         sourceIsFallback: true,
       }
-      break
     }
   }
 

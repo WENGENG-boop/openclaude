@@ -84,6 +84,7 @@ import type { HooksSettings } from '../settings/types.js'
 import { SettingsSchema } from '../settings/types.js'
 import { jsonParse, jsonStringify } from '../slowOperations.js'
 import { getAddDirEnabledPlugins } from './addDirPluginSettings.js'
+import { getBuiltinDefaultEnabledPlugins } from './agentSkillsMarketplace.js'
 import { verifyAndDemote } from './dependencyResolver.js'
 import { classifyFetchError, logPluginFetch } from './fetchTelemetry.js'
 import { checkGitAvailable } from './gitAvailability.js'
@@ -2070,8 +2071,10 @@ async function loadPluginsFromMarketplaces({
   errors: PluginError[]
 }> {
   const settings = getSettings_DEPRECATED()
-  // Merge --add-dir plugins at lowest priority; standard settings win on conflict
+  // Merge built-in default-on plugins (e.g. document-skills) at the lowest
+  // priority, then --add-dir plugins; standard settings win on conflict.
   const enabledPlugins = {
+    ...getBuiltinDefaultEnabledPlugins(),
     ...getAddDirEnabledPlugins(),
     ...(settings.enabledPlugins || {}),
   }
